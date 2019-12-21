@@ -1,4 +1,5 @@
 from django.db import models
+from django_matplotlib.fields import MatplotlibFigureField
 
 
 class BoardModel(models.Model):
@@ -7,3 +8,6 @@ class BoardModel(models.Model):
 
     def __str__(self):
         return self.bname
+
+class MyModelWithFigure(models.Model):
+    figure = MatplotlibFigureField(figure='my_figure')

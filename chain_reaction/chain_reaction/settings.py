@@ -37,7 +37,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'chain_app'
+    'chain_app',
+    'django_matplotlib',
 ]
 
 MIDDLEWARE = [
