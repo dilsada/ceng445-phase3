@@ -1,7 +1,7 @@
 from django.db import models
 
 
-class Board(models.Model):
+class BoardModel(models.Model):
     bid = models.CharField(max_length=10, primary_key=True)
     bname = models.CharField(max_length=30, unique=True)
 

@@ -2,10 +2,14 @@ from django.shortcuts import render
 from django.views.generic import View
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
-from chain_app import forms
+from . import forms
 from django.shortcuts import redirect
 from django.http import HttpResponseRedirect, HttpResponse
 from django.urls import reverse
+from .models import BoardModel
+import os.path
+
+from .library import Board, Ball
 
 class RegisterView(View):
 	register_form = forms.RegisterForm()
@@ -52,12 +56,23 @@ class HomeView(View):
 		self.board_form = forms.BoardForm(data=request.POST)
 		if self.board_form.is_valid():
 			selected_board = self.board_form.cleaned_data.get('selected_board')
-			print(selected_board)
 			return HttpResponseRedirect(reverse('board', kwargs={'board_id': selected_board}))
 		else:
 			print('Board selection failed')
 			return HttpResponse("class HomeView, post error: invalid board selection")
 
 class BoardView(View):
+	boardJSONs = {'1': 'test1.json', '2': 'test2.json', '3': 'test3.json', '4': 'test4.json'}
+
 	def get(self, request, board_id):
+		board_name = BoardModel.objects.get(bid=int(board_id))
+		dir_path = os.path.dirname(os.path.realpath(__file__))
+		print(dir_path)
+		fname = os.path.join(dir_path, 'library/inputs', self.boardJSONs[board_id])
+		print(fname)
+		board = Board.Board(name=board_name)
+
+		board.load(fname)
+		print(board.state())
+
 		return render(request, 'board.html', {'board_id': self.kwargs.get('board_id')})
