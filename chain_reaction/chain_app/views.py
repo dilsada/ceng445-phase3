@@ -1,3 +1,4 @@
+import os.path
 from django.shortcuts import render
 from django.views.generic import View
 from django.contrib.auth import authenticate, login, logout
@@ -7,7 +8,7 @@ from django.shortcuts import redirect
 from django.http import HttpResponseRedirect, HttpResponse
 from django.urls import reverse
 from .models import BoardModel
-import os.path
+from django.http import HttpResponse
 
 from .library import Board, Ball
 
@@ -67,11 +68,8 @@ class BoardView(View):
 	def get(self, request, board_id):
 		board_name = BoardModel.objects.get(bid=int(board_id))
 		dir_path = os.path.dirname(os.path.realpath(__file__))
-		print(dir_path)
 		fname = os.path.join(dir_path, 'library/inputs', self.boardJSONs[board_id])
-		print(fname)
 		board = Board.Board(name=board_name)
-
 		board.load(fname)
 		print(board.state())
 
