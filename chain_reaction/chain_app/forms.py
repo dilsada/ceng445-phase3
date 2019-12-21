@@ -1,6 +1,13 @@
 from django import forms
 from django.contrib.auth.models import User
 
+BOARD_CHOICES= [
+    ('1', 'Board 1'),
+    ('2', 'Board 2'),
+    ('3', 'Board 3'),
+    ('4', 'Board 4'),
+    ]
+
 class RegisterForm(forms.ModelForm):
     first_name = forms.CharField(widget=forms.TextInput(attrs={'placeholder': 'First Name'}), label='', required=True)
     last_name = forms.CharField(widget=forms.TextInput(attrs={'placeholder': 'Last Name'}), label='', required=True)
@@ -16,3 +23,7 @@ class RegisterForm(forms.ModelForm):
 class LoginForm(forms.Form):
     username = forms.CharField(widget=forms.TextInput(attrs={'placeholder': 'UserName'}), label='', required=True)
     password = forms.CharField(widget=forms.PasswordInput(attrs={'placeholder': 'Password'}), label='', required=True)
+
+class BoardForm(forms.Form):
+    selected_board = forms.CharField(label='What is your board choice?', widget=forms.Select(choices=BOARD_CHOICES))
+    print(selected_board)

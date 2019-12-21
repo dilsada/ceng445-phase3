@@ -28,7 +28,6 @@ class LoginView(View):
 	def post(self, request):
 		self.login_form = forms.LoginForm(data=request.POST)
 		if self.login_form.is_valid():
-			print('Login form not valid')
 			user = authenticate(username=self.login_form.cleaned_data['username'],
 								password=self.login_form.cleaned_data['password'])
 			if user:
@@ -44,5 +43,17 @@ class LogoutView(View):
 		return HttpResponseRedirect(reverse('login'))
 
 class HomeView(View):
+	board_form = forms.BoardForm()
+
 	def get(self,request):
-		return render(request, 'home.html')
+		return render(request, 'home.html', {'form': self.board_form})
+
+	def post(self, request):
+		self.board_form = forms.BoardForm(data=request.POST)
+		if self.board_form.is_valid():
+			selected_board = self.board_form.cleaned_data['selected_board']
+			print(selected_board)
+			return HttpResponseRedirect(reverse('home'))
+		else:
+			print('Board selection failed')
+			return HttpResponse("class HomeView, post error: invalid board selection")
