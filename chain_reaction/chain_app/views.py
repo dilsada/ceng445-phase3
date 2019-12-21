@@ -51,7 +51,7 @@ class HomeView(View):
 	def post(self, request):
 		self.board_form = forms.BoardForm(data=request.POST)
 		if self.board_form.is_valid():
-			selected_board = self.board_form.cleaned_data['selected_board']
+			selected_board = self.board_form.cleaned_data.get('selected_board')
 			print(selected_board)
 			return HttpResponseRedirect(reverse('home'))
 		else:
