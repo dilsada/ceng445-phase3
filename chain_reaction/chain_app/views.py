@@ -12,6 +12,13 @@ from django.http import HttpResponse
 
 from .library import Board, Ball
 
+import numpy as np
+import matplotlib.pyplot as plt
+import matplotlib.lines as mlines
+import matplotlib.patches as mpatches
+from matplotlib import animation
+from matplotlib.collections import PatchCollection
+
 class RegisterView(View):
 	register_form = forms.RegisterForm()
 	def get(self, request):
@@ -62,6 +69,40 @@ class HomeView(View):
 			print('Board selection failed')
 			return HttpResponse("class HomeView, post error: invalid board selection")
 
+def plotter(state):
+	frames = []
+	shapes = []
+	def init():
+		plt.axis('equal')
+
+	def addShapes(ax, shapes):
+		for s in shapes:
+			if type(s) == mlines.Line2D:
+				ax.add_line(s)
+			else:
+				ax.add_patch(s)
+
+	def animate(dt):
+		ax.clear()
+		ax.set_xlim((0, 600))
+		ax.set_ylim((0, 600))
+		addShapes(ax, frames[dt])
+
+	for object in state:
+		shape = object[0]
+		pos = object[2]
+
+		if shape.getType() == 'bowlingBall':
+			x, y, r = float(pos[0]), float(pos[1]), float(shape.bowlingRadius)
+			shapes.append(mpatches.Circle((x, y), r))
+
+	frames.append(tuple(shapes))
+	fig, ax = plt.subplots()
+	anim = animation.FuncAnimation(fig, animate, init_func=init,
+								   frames=len(frames), interval=20, blit=False)
+	#plt.show()
+
+
 class BoardView(View):
 	boardJSONs = {'1': 'test1.json', '2': 'test2.json', '3': 'test3.json', '4': 'test4.json'}
 
@@ -69,8 +110,10 @@ class BoardView(View):
 		board_name = BoardModel.objects.get(bid=int(board_id))
 		dir_path = os.path.dirname(os.path.realpath(__file__))
 		fname = os.path.join(dir_path, 'library/inputs', self.boardJSONs[board_id])
+
 		board = Board.Board(name=board_name)
 		board.load(fname)
 		print(board.state())
+		plotter(state = board.state())
 
 		return render(request, 'board.html', {'board_id': self.kwargs.get('board_id')})
