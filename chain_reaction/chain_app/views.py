@@ -45,7 +45,7 @@ class LogoutView(View):
 class HomeView(View):
 	board_form = forms.BoardForm()
 
-	def get(self,request):
+	def get(self, request):
 		return render(request, 'home.html', {'form': self.board_form})
 
 	def post(self, request):
@@ -53,7 +53,11 @@ class HomeView(View):
 		if self.board_form.is_valid():
 			selected_board = self.board_form.cleaned_data.get('selected_board')
 			print(selected_board)
-			return HttpResponseRedirect(reverse('home'))
+			return HttpResponseRedirect(reverse('board', kwargs={'board_id': selected_board}))
 		else:
 			print('Board selection failed')
 			return HttpResponse("class HomeView, post error: invalid board selection")
+
+class BoardView(View):
+	def get(self, request, board_id):
+		return render(request, 'board.html', {'board_id': self.kwargs.get('board_id')})
