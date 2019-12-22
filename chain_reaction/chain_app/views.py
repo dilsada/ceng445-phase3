@@ -79,12 +79,17 @@ class HomeView(View):
 			print('Board selection failed')
 			return HttpResponse("class HomeView, post error: invalid board selection")
 
+
 def plotter(state, board_id):
 	board_name = BoardModel.objects.get(bid=int(board_id))
-	board = Board.Board(name=board_name)
-	state = board.state()
+
+	state = json.loads(board_name.bstate)
+	print('-----')
+	print(state)
+	print('-----')
 	frames = []
 	shapes = []
+
 	def init():
 		plt.axis('equal')
 
@@ -101,24 +106,19 @@ def plotter(state, board_id):
 		ax.set_ylim((0, 600))
 		addShapes(ax, frames[dt])
 
-	for object in state:
-		shape = object[0]
-		pos = object[2]
-
-		if shape.getType() == 'bowlingBall':
-			x, y, r = float(pos[0]), float(pos[1]), float(shape.bowlingRadius)
-			shapes.append(mpatches.Circle((x, y), r))
+	for ball in state['balls']:
+		shapes.append(mpatches.Circle(ball['center'], 50))
 
 	frames.append(tuple(shapes))
 	fig, ax = plt.subplots()
 	anim = animation.FuncAnimation(fig, animate, init_func=init,
 								   frames=len(frames), interval=20, blit=False)
-	#plt.show()
-	#return fig
+	# plt.show()
+	# return fig
 	canvas = FigureCanvas(fig)
 	buf = io.BytesIO()
 	plt.savefig(buf)
-	#plt.close(fig)
+	# plt.close(fig)
 
 	response = HttpResponse(buf.getvalue(), content_type='image/png')
 	return response
@@ -167,7 +167,6 @@ class BoardView(View):
 			x_coord = self.shape_form.cleaned_data['x']
 			y_coord = self.shape_form.cleaned_data['y']
 
-			#print(selected_shape)
 			newShape = createShape(shapeID=int(selected_shape), x = x_coord, y = y_coord)
 			content = 'New ' + str(newShape.getType()) + ' at coordinte (' + x_coord + ', ' +y_coord  + ') added successfully.'
 			board_name = BoardModel.objects.get(bid=int(board_id))
@@ -183,7 +182,11 @@ class BoardView(View):
 
 			board_name.bstate = json.dumps(self.board.save())
 			board_name.save()
-			return render(request, 'board.html', {'board_id': self.kwargs.get('board_id'), 'form': self.shape_form, 'msg' : content})
+
+			current_state = self.board.save()
+			print (current_state)
+
+			return render(request, 'board.html', {'board_id': self.kwargs.get('board_id'), 'form': self.shape_form, 'msg' : content, 'state': current_state})
 
 		else:
 			print('Shape selection failed')
