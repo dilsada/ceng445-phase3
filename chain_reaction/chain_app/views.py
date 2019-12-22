@@ -139,7 +139,7 @@ def createShape(shapeID, x, y):
 	elif shapeID == 5:
 		newShape = DominoBlock.DominoBlock(center = (x,y))
 	elif shapeID == 6:
-		pass
+		newShape = Segment.Segment(mass=300, p1=[x,y], p2=[x-100,y-100], radius=5)
 	elif shapeID == 7:
 		newShape = RotatingSegment.RotatingSegment(rotationCenter = (x,y), length = 100,  radius = 5.0)
 	else:

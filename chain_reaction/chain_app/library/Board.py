@@ -55,6 +55,13 @@ class Board():
         self.id_counter += 1
         self.allShapes[str(new_id)] = shape
 
+    def addShapeWithID(self, shape, shape_id):
+        body = shape.getBody()
+        self.space.add(shape)
+        self.space.add(body)
+        new_id = shape_id
+        self.allShapes[str(new_id)] = shape
+
     def addJoint(self, joint):
         self.space.add(joint)
 
@@ -239,7 +246,7 @@ class Board():
             else:
                 newBall = TennisBall(ball['center'])
 
-            self.addShape(newBall, newBall.body)
+            self.addShapeWithID(newBall, ball['id'])
   
         for block in content['blocks']:
             if block['type'] == 'bookBlock':
@@ -247,16 +254,16 @@ class Board():
             else:
                 newBlock = DominoBlock(block['center'])
             
-            self.addShape(newBlock, newBlock.body)
+            self.addShapeWithID(newBlock,  block['id'])
 
         for segment in content['segments']:
             if segment['type'] == 'segment':
                 newSegment = Segment(segment['mass'], segment['p1'], segment['p2'], segment['radius'])
-                self.addShape(newSegment, newSegment.body)
+                self.addShapeWithID(newSegment, segment['id'])
                 
             else:
                 newSegment = RotatingSegment(segment['rotationCenter'], segment['length'], segment['radius'], segment['orientation'])
-                self.addShape(newSegment, newSegment.getBody())
+                self.addShapeWithID(newSegment, segment['id'])
                 self.addJoint(newSegment.getJoint())
 
         for connector in content['connectors']:

@@ -11,24 +11,40 @@
 <button><a href="/home">Select Another Board</a></button>
 <button><a href="/board/{{board_id}}/game">Start Game</a></button>
 
-<table>
+<table cellspacing="10">
     <tr>
         <th>Shape ID</th>
         <th>Shape Name</th>
         <th>Coordinate</th>
     </tr>
-    {% for s in state %}
-        <tr>
-            <td>{{s}}</td>
-            {% if s == balls %}
-                {% for ball in state.s %}
-                    <td>asdasd</td>
-                    <td>{{ball.id}}</td>
-                    <td>{{ball.type}}</td>
-                {% endfor %}
-            {% endif %}
+    {% for key,value in state.items %}
+        {% if key == "balls" or key == "blocks" %}
+            {% for shape in value %}
+                <tr>
+                    <td>{{shape.id}}</td>
+                    <td>{{shape.type}}</td>
+                    <td>{{shape.center}}</td>
+                </tr>
+            {% endfor %}
 
-        </tr>
+        {% elif key == "segments"%}
+            {% for shape in value %}
+                {% if shape.type == "segment"%}
+                    <tr>
+                        <td>{{shape.id}}</td>
+                        <td>{{shape.type}}</td>
+                        <td>{{shape.p1}}</td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td>{{shape.id}}</td>
+                        <td>{{shape.type}}</td>
+                        <td>{{shape.rotationCenter}}</td>
+                    </tr>
+                {% endif %}
+            {% endfor %}
+        {% endif %}
     {% endfor %}
 </table>
+
 
