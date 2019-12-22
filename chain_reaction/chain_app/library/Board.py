@@ -84,33 +84,41 @@ class Board():
                 return 
 
     def removeShapeWithID(self, shape_id):
-        shape = self.allShapes[shape_id]
-        del self.allShapes[shape_id]
-        self.space.remove(shape)
+        if shape_id in self.allShapes.keys():
+            shape = self.allShapes[shape_id]
+            del self.allShapes[shape_id]
+            self.space.remove(shape)
 
-    def moveShape(self, shape, offset):
+    def moveShape(self, shape, x, y):
         pos = shape.getPosition()
-        center = (pos[0]+offset[0], pos[1]+offset[1])
-        shape.setPosition(center)
+        center = (pos[0]+x, pos[1]+y)
+        #shape.setPosition(center)
+        shape.getBody().position = center
 
-    def connect(self, shape1, shape2, connectorClass = None):
+    def connect(self, shape1_id, shape2_id, connectorClass = None):
         # Reminder: Add other connector classes as if checks later
+        shape1 = self.allShapes[shape1_id]
+        shape2 = self.allShapes[shape2_id]
         newConnector = Connector(shape1.getBody(), shape2.getBody())
         self.space.add(newConnector.getPinJoint())
 
         connector_id = self.id_counter
         self.id_counter += 1
-        self.connectors[str(connector_id)] = [newConnector, shape1, shape2]
+        self.connectors[str(connector_id)] = [newConnector, shape1_id, shape2_id]
         print("New connection established between " + str(shape1) + " and " + str(shape2))
 
     def disconnect(self, connector_id):
         connector = (self.connectors.pop(connector_id))[0]
         self.space.remove(connector.getPinJoint())
     
-    def disconnectShapes(self, shape1, shape2):
+    def disconnectShapes(self, shape1_id, shape2_id):
+        shape1 = self.allShapes[str(shape1_id)]
+        shape2 = self.allShapes[str(shape2_id)]
         for key,value in self.connectors.items():
-            if(shape1 in value and shape2 in value):
-                self.disconnect(key)
+            if(shape1_id in value and shape2_id in value):
+                #self.disconnect(key)
+                connector = (self.connectors.pop(key))[0]
+                self.space.remove(connector.getPinJoint())
                 print("Connection between " + str(shape1) + " and " + str(shape2) + " is removed.")
                 break
 
@@ -224,6 +232,15 @@ class Board():
             else:
                 print("INVALID SHAPE TYPE TO SAVE")
         
+        for key, value in self.connectors.items():
+            newConnector = {
+                "id": key,
+                "type": "connector",
+                "shape1_id": value[1],
+                "shape2_id": value[2]
+            }
+            content['connectors'].append(newConnector)
+
         return content
 
     def load(self, file):
@@ -271,9 +288,7 @@ class Board():
         for connector in content['connectors']:
             shape1_id = connector['shape1_id']
             shape2_id = connector['shape2_id']
-            shape1 = self.allShapes[shape1_id]
-            shape2 = self.allShapes[shape2_id] 
-            self.connect(shape1, shape2)
+            self.connect(shape1_id, shape2_id)
         
         print(colors.writeBold("JSON file loaded successfully "))
 

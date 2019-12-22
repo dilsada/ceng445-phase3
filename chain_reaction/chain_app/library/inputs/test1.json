@@ -49,12 +49,7 @@
         }
     ],
     "connectors": [
-        {
-            "id":"7",
-            "type": "connector",
-            "shape1_id": "1",
-            "shape2_id": "2"
-        }
+
     ]
 
 }

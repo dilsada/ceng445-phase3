@@ -42,3 +42,7 @@ class ShapeForm(forms.Form):
     selected_shape = forms.CharField(widget=forms.RadioSelect(choices=SHAPE_CHOICES))
     x = forms.CharField(widget=forms.NumberInput(attrs={'placeholder': 'x coordinate'}), required=True)
     y = forms.CharField(widget=forms.NumberInput(attrs={'placeholder': 'y coordinate'}), required=True)
+    remove_id = forms.IntegerField(max_value = 1000, required=False)
+    move_id = forms.IntegerField(max_value = 1000, required=False)
+    connect_id_1 = forms.IntegerField(max_value = 1000, required=False)
+    connect_id_2 = forms.IntegerField(max_value = 1000, required=False)

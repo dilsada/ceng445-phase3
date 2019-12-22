@@ -44,7 +44,7 @@ class Ball(pymunk.Circle):
 
     def getBody(self):
         return self.ballBody
-
+    
     def setPosition(self, center):
         self.ballBody.position = center
 
