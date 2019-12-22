@@ -5,6 +5,7 @@ import json
 class BoardModel(models.Model):
     bid = models.CharField(max_length=10, primary_key=True)
     bname = models.CharField(max_length=30, unique=True)
+    loadFlag = models.BooleanField(default=False)
     bstate = models.CharField(max_length=1000, default='{}')
 
     def __str__(self):

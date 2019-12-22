@@ -146,12 +146,15 @@ def createShape(shapeID, x, y):
 		print("invalid shape id")
 	return newShape
 
+
+
 class BoardView(View):
 	boardJSONs = {'1': 'test1.json', '2': 'test2.json', '3': 'test3.json', '4': 'test4.json'}
 	shape_form = forms.ShapeForm()
 
 	def __init__(self):
 		self.board = None
+
 
 	def get(self, request, board_id):
 		if not request.user.is_authenticated:
@@ -162,6 +165,7 @@ class BoardView(View):
 
 	def post(self, request, board_id):
 		self.shape_form = forms.ShapeForm(data=request.POST)
+
 		if self.shape_form.is_valid():
 			selected_shape = self.shape_form.cleaned_data.get('selected_shape')
 			x_coord = self.shape_form.cleaned_data['x']
@@ -172,9 +176,17 @@ class BoardView(View):
 			board_name = BoardModel.objects.get(bid=int(board_id))
 			dir_path = os.path.dirname(os.path.realpath(__file__))
 			fname = os.path.join(dir_path, 'library/inputs', self.boardJSONs[board_id])
-
 			self.board = Board.Board(name=board_name)
-			self.board.load(fname)
+
+			if not board_name.loadFlag:
+				self.board.load(fname)
+				board_name.loadFlag = True
+				board_name.save()
+
+			else:
+				print("ELSE'E GIRDI !1111")
+				self.board.loadstr(board_name.bstate)
+
 			print(self.board.state())
 			print(self.board.boardName)
 			self.board.addShape(newShape)

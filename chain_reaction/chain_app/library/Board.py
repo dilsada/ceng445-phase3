@@ -220,6 +220,13 @@ class Board():
     def load(self, file):
         with open(file) as json_file:
             content = json.load(json_file)
+        self.loadHelper(content)
+
+    def loadstr(self, state):
+        content = json.loads(state)
+        self.loadHelper(content)
+
+    def loadHelper(self, content):
         self.setName(content['boardName'])
         self.setScreen(content['x'], content['y'])
         self.setGravity(content['gravity'])
@@ -259,7 +266,7 @@ class Board():
             shape2 = self.allShapes[shape2_id] 
             self.connect(shape1, shape2)
         
-        print(colors.writeBold("JSON file loaded successfully from " + file))
+        print(colors.writeBold("JSON file loaded successfully "))
 
     def state(self, update = False):
         state = []

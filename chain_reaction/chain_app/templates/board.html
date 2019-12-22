@@ -11,3 +11,24 @@
 <button><a href="/home">Select Another Board</a></button>
 <button><a href="/board/{{board_id}}/game">Start Game</a></button>
 
+<table>
+    <tr>
+        <th>Shape ID</th>
+        <th>Shape Name</th>
+        <th>Coordinate</th>
+    </tr>
+    {% for s in state %}
+        <tr>
+            <td>{{s}}</td>
+            {% if s == balls %}
+                {% for ball in state.s %}
+                    <td>asdasd</td>
+                    <td>{{ball.id}}</td>
+                    <td>{{ball.type}}</td>
+                {% endfor %}
+            {% endif %}
+
+        </tr>
+    {% endfor %}
+</table>
+
