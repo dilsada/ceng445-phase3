@@ -1,14 +1,17 @@
 <p style="font-size: 30px">Board {{board_id}}</p>
 <p align="right">Logged in as {{ username }} <a href="/logout">Logout</a></p>
+<p align="right"> <a href="/admin">Admin</a></p>
 
 <p>{{msg}}</p>
 <form enctype="multipart/form-data" method="post">
     {% csrf_token %}
     {{form.as_p}}
-        <button type="submit" value="Shape" style="color: black">Add Shape</button>
-        <button type="submit" value="Remove" style="color: black">Remove Shape</button>
-        <button type="submit" value="Move" style="color: black">Move Shape</button>
-        <button type="submit" value="Connect" style="color: black">Connect/Disconnect Shapes</button>
+        <button type="submit" name="add" value="Shape" style="color: black">Add Shape</button>
+        <button type="submit" name="remove" value="Remove" style="color: black">Remove Shape</button>
+        <button type="submit" name="move" value="Move" style="color: black">Move Shape</button>
+        <button type="submit" name="connect" value="Connect" style="color: black">Connect Shapes</button>
+        <button type="submit" name="disconnect" value="Disconnect" style="color: black">Disconnect Shapes</button>
+        <button type="submit" name="pick" value="Pick" style="color: black">Pick</button>
 </form>
 
 <button><a href="/home">Select Another Board</a></button>

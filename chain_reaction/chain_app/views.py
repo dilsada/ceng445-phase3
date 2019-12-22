@@ -162,7 +162,17 @@ class BoardView(View):
 			return redirect('/login')
 
 		board_name = BoardModel.objects.get(bid=int(board_id))
-		return render(request, 'board.html', {'board_id': self.kwargs.get('board_id'), 'username': request.user, 'form': self.shape_form, 'msg' : ''})
+		dir_path = os.path.dirname(os.path.realpath(__file__))
+		fname = os.path.join(dir_path, 'library/inputs', self.boardJSONs[board_id])
+		self.board = Board.Board(name=board_name)
+		self.board.load(fname)
+		board_name.save()
+
+		board_name.bstate = json.dumps(self.board.save())
+		board_name.save()
+		current_state = self.board.save()
+
+		return render(request, 'board.html', {'board_id': self.kwargs.get('board_id'), 'username': request.user, 'form': self.shape_form, 'state': current_state, 'msg' : ''})
 
 	def post(self, request, board_id):
 		self.shape_form = forms.ShapeForm(data=request.POST)
@@ -171,12 +181,11 @@ class BoardView(View):
 			selected_shape = self.shape_form.cleaned_data.get('selected_shape')
 			x_coord = self.shape_form.cleaned_data['x']
 			y_coord = self.shape_form.cleaned_data['y']
-			remove_id = self.shape_form.cleaned_data['remove_id']
-			move_id = self.shape_form.cleaned_data['move_id']
-			connect_id_1 = self.shape_form.cleaned_data['connect_id_1']
-			connect_id_2 = self.shape_form.cleaned_data['connect_id_2']
+			shape_id_1 = str(self.shape_form.cleaned_data['shape_id_1'])
+			shape_id_2 = str(self.shape_form.cleaned_data['shape_id_2'])
 
-			newShape = createShape(shapeID=int(selected_shape), x = x_coord, y = y_coord)
+			if selected_shape:
+				newShape = createShape(shapeID=int(selected_shape), x = x_coord, y = y_coord)
 			
 			board_name = BoardModel.objects.get(bid=int(board_id))
 			dir_path = os.path.dirname(os.path.realpath(__file__))
@@ -189,50 +198,58 @@ class BoardView(View):
 				board_name.save()
 
 			else:
-				print("ELSE'E GIRDI !1111")
 				self.board.loadstr(board_name.bstate)
 
 			print(self.board.state())
 			print(self.board.boardName)
 			
 			content = ''
-			if remove_id:
-				self.board.removeShapeWithID(str(remove_id))
-			elif move_id:
-				x = int(x_coord)
-				y = int(y_coord)
-				print(self.board.allShapes[str(move_id)])
-				self.board.moveShape(self.board.allShapes[str(move_id)], x, y)
-				content = str(newShape.getType())   + ' moved successfully' + ' by (' + str(x_coord) + ', ' + str(y_coord) + ')'
-			elif connect_id_1 and connect_id_2:
-				isConnected = False 
-				shape1 = self.board.allShapes[str(connect_id_1)]
-				shape2 = self.board.allShapes[str(connect_id_2)]
+			if 'remove' in request.POST:
+				if shape_id_1 and shape_id_1 in self.board.allShapes.keys():
+					self.board.removeShapeWithID(str(shape_id_1))
+			elif 'move' in request.POST:
+				if shape_id_1 and shape_id_1 in self.board.allShapes.keys():
+					x = int(x_coord)
+					y = int(y_coord)
+					self.board.moveShape(self.board.allShapes[str(shape_id_1)], x, y)
+					content = str(newShape.getType())   + ' moved successfully' + ' by (' + str(x_coord) + ', ' + str(y_coord) + ')'
 
-				print(colors.writeRed(str(self.board.connectors)))
+			elif 'connect' in request.POST:
+				if shape_id_1 and shape_id_1 in self.board.allShapes.keys() and shape_id_2 and shape_id_2 in self.board.allShapes.keys():
+					shape1 = self.board.allShapes[str(shape_id_1)]
+					shape2 = self.board.allShapes[str(shape_id_2)]
 
-				for key, value in self.board.connectors.items():
-					print(colors.writeYellow(str(key)))
-					print(colors.writeGreen(str(value)))
-					if (str(connect_id_1) in value and str(connect_id_2) in value):
-						isConnected = True
-						self.board.disconnectShapes(connect_id_1, connect_id_2)
-						content = str(shape1.getType()) + ' ' + str(connect_id_1) + ' and ' + str(shape2.getType()) + ' ' + str(connect_id_2) + ' are disconnected successfully.'
-
-				if not isConnected:
-					self.board.connect(str(connect_id_1), str(connect_id_2))
-					content = str(shape1.getType()) + ' ' + str(connect_id_1) + ' and ' + str(shape2.getType()) + ' ' + str(connect_id_2) + ' are connected successfully.'
+					self.board.connect(str(shape_id_1), str(shape_id_2))
+					content = str(shape1.getType()) + ' ' + str(shape_id_1) + ' and ' + str(shape2.getType()) + ' ' + str(shape_id_2) + ' are connected successfully.'
 			
-			else:
-				self.board.addShape(newShape)
-				content = 'New ' + str(newShape.getType()) + ' at coordinte (' + x_coord + ', ' +y_coord  + ') added successfully.'
-			print(self.board.state())
+			elif 'disconnect' in request.POST:
+				if shape_id_1 and shape_id_1 in self.board.allShapes.keys() and shape_id_2 and shape_id_2 in self.board.allShapes.keys():
+					shape1 = self.board.allShapes[str(shape_id_1)]
+					shape2 = self.board.allShapes[str(shape_id_2)]
 
+					self.board.disconnectShapes(str(shape_id_1), str(shape_id_2))
+					content = str(shape1.getType()) + ' ' + str(shape_id_1) + ' and ' + str(shape2.getType()) + ' ' + str(shape_id_2) + ' are disconnected successfully.'
+			
+			elif 'add' in request.POST:
+				if selected_shape and x_coord and y_coord:
+					self.board.addShape(newShape)
+					content = 'New ' + str(newShape.getType()) + ' at coordinte (' + x_coord + ', ' + y_coord  + ') added successfully.'
+			
+			elif 'pick' in request.POST:
+				if x_coord and y_coord:
+					x = int(x_coord)
+					y = int(y_coord)
+					res = self.board.pick(x, y)
+					content = str(res)
+
+			else:
+				print(colors.writeBold("Invalid button"))
+			
 			board_name.bstate = json.dumps(self.board.save())
 			board_name.save()
 
 			current_state = self.board.save()
-			print (current_state)
+			print (colors.writeGreen(str(current_state)))
 
 			return render(request, 'board.html', {'board_id': self.kwargs.get('board_id'), 'form': self.shape_form, 'msg' : content, 'state': current_state})
 
