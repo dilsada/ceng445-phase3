@@ -158,7 +158,7 @@ class Board():
         self.allShapes = {}
         self.users = {}
 
-    def save(self, file):
+    def save(self):
         content = {}
         content['boardName'] = self.boardName
         content['x'] = self.x
@@ -215,8 +215,7 @@ class Board():
             else:
                 print("INVALID SHAPE TYPE TO SAVE")
         
-        with open(file, 'w') as outfile:
-            json.dump(content, outfile)
+        return content
 
     def load(self, file):
         with open(file) as json_file:

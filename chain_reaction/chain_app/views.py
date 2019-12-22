@@ -19,6 +19,8 @@ import matplotlib.patches as mpatches
 from matplotlib import animation
 from matplotlib.collections import PatchCollection
 
+import json
+
 class RegisterView(View):
 	register_form = forms.RegisterForm()
 	def get(self, request):
@@ -154,6 +156,9 @@ class BoardView(View):
 			print(self.board.boardName)
 			self.board.addShape(newShape)
 			print(self.board.state())
+
+			board_name.bstate = json.dumps(self.board.save())
+			board_name.save()
 			return HttpResponse(selected_shape)
 
 		else:
