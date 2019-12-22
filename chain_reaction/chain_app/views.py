@@ -37,7 +37,7 @@ class RegisterView(View):
 class LoginView(View):
 	login_form = forms.LoginForm()
 	def get(self, request):
-		return render(request, 'login.html', {'form': self.login_form})
+		return render(request, 'login.html', {'form': self.login_form, 'message' : ''})
 
 	def post(self, request):
 		self.login_form = forms.LoginForm(data=request.POST)
@@ -47,6 +47,9 @@ class LoginView(View):
 			if user:
 				login(request, user)
 				return HttpResponseRedirect(reverse('home'))
+			else:
+				return render(request, 'login.html', {'form': self.login_form, 'message' : 'wrong'})
+
 		else:
 			print('Login failed')
 			return HttpResponse("invalid login details")
@@ -54,12 +57,14 @@ class LoginView(View):
 class LogoutView(View):
 	def get(self,request):
 		logout(request)
-		return HttpResponseRedirect(reverse('login'))
+		return HttpResponseRedirect(reverse('login'), {'message' : ''})
 
 class HomeView(View):
 	board_form = forms.BoardForm()
 
 	def get(self, request):
+		if not request.user.is_authenticated:
+			return redirect('/login')
 		return render(request, 'home.html', {'form': self.board_form})
 
 	def post(self, request):
@@ -135,6 +140,9 @@ class BoardView(View):
 		self.board = None
 
 	def get(self, request, board_id):
+		if not request.user.is_authenticated:
+			return redirect('/login')
+
 		board_name = BoardModel.objects.get(bid=int(board_id))
 
 		return render(request, 'board.html', {'board_id': self.kwargs.get('board_id'), 'form': self.shape_form})

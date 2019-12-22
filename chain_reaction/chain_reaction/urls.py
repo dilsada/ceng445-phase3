@@ -20,6 +20,7 @@ from chain_app import views
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
+    url(r'^$', views.HomeView.as_view(), name='home'),
     path('register/', views.RegisterView.as_view(), name='register'),
     path('login/', views.LoginView.as_view(), name='login'),
     path('home/', views.HomeView.as_view(), name='home'),
