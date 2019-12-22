@@ -1,1 +1,7 @@
-<p>Board {{board_id}}</p>
+<p style="font-size: 30px">Board {{board_id}}</p>
+
+<form enctype="multipart/form-data" method="post">
+    {% csrf_token %}
+    {{form.as_p}}
+        <button type="submit" value="Shape" style="color: black">Add Shape</button>
+</form>

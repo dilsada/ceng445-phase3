@@ -8,6 +8,16 @@ BOARD_CHOICES= [
     ('4', 'Board 4'),
     ]
 
+SHAPE_CHOICES = [
+    ('1', 'Bowling Ball'),
+    ('2', 'Marble Ball'),
+    ('3', 'Tennis Ball'),
+    ('4', 'Book Block'),
+    ('5', 'Domino Block'),
+    ('6', 'Segment'),
+    ('7', 'Rotating Segment'),
+    ]
+
 class RegisterForm(forms.ModelForm):
     first_name = forms.CharField(widget=forms.TextInput(attrs={'placeholder': 'First Name'}), label='', required=True)
     last_name = forms.CharField(widget=forms.TextInput(attrs={'placeholder': 'Last Name'}), label='', required=True)
@@ -27,3 +37,7 @@ class LoginForm(forms.Form):
 class BoardForm(forms.Form):
     selected_board = forms.CharField(label='What is your board choice?', widget=forms.Select(choices=BOARD_CHOICES))
     print(selected_board)
+
+class ShapeForm(forms.Form):
+    selected_shape = forms.CharField(widget=forms.RadioSelect(choices=SHAPE_CHOICES))
+    print(selected_shape)
