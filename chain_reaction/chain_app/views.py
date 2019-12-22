@@ -122,7 +122,7 @@ def createShape(shapeID):
 	elif shapeID == 7:
 		newShape = RotatingSegment.RotatingSegment(rotationCenter = (x,y), length = 100,  radius = 5.0)
 	else:
-		return 'unvalid shape'
+		print("invalid shape id")
 	return newShape
 
 class BoardView(View):
@@ -134,13 +134,6 @@ class BoardView(View):
 
 	def get(self, request, board_id):
 		board_name = BoardModel.objects.get(bid=int(board_id))
-		dir_path = os.path.dirname(os.path.realpath(__file__))
-		fname = os.path.join(dir_path, 'library/inputs', self.boardJSONs[board_id])
-
-		self.board = Board.Board(name=board_name)
-		self.board.load(fname)
-		print(self.board.state())
-		#plotter(state = board.state())
 
 		return render(request, 'board.html', {'board_id': self.kwargs.get('board_id'), 'form': self.shape_form})
 
@@ -148,7 +141,9 @@ class BoardView(View):
 		self.shape_form = forms.ShapeForm(data=request.POST)
 		if self.shape_form.is_valid():
 			selected_shape = self.shape_form.cleaned_data.get('selected_shape')
-			newShape = createShape(shapeID=selected_shape)
+			print("SELECTED SHAPE:::::::")
+			print(selected_shape)
+			newShape = createShape(shapeID=int(selected_shape))
 			board_name = BoardModel.objects.get(bid=int(board_id))
 			dir_path = os.path.dirname(os.path.realpath(__file__))
 			fname = os.path.join(dir_path, 'library/inputs', self.boardJSONs[board_id])
@@ -164,3 +159,4 @@ class BoardView(View):
 		else:
 			print('Shape selection failed')
 			return HttpResponse("class BoardView, post error: invalid shape selection")
+
