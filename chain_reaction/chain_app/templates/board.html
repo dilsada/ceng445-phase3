@@ -1,8 +1,13 @@
 <p style="font-size: 30px">Board {{board_id}}</p>
-<p align="right">{{ username }}<a href="/logout">Logout</a></p>    
+<p align="right">Logged in as {{ username }} <a href="/logout">Logout</a></p>
 
+<p>{{msg}}</p>
 <form enctype="multipart/form-data" method="post">
     {% csrf_token %}
     {{form.as_p}}
         <button type="submit" value="Shape" style="color: black">Add Shape</button>
 </form>
+
+<button><a href="/home">Select Another Board</a></button>
+<button><a href="/board/{{board_id}}/game">Start Game</a></button>
+

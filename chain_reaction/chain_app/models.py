@@ -11,9 +11,8 @@ class BoardModel(models.Model):
         return self.bname
 
     def setState(self, state):
-        
-        print("BEFORE DUMPING JSON")
-        print(state)
+        #print("BEFORE DUMPING JSON")
+        #print(state)
         self.bstate = json.dumps(state)
 
     def getState(self):

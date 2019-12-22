@@ -36,8 +36,9 @@ class LoginForm(forms.Form):
 
 class BoardForm(forms.Form):
     selected_board = forms.CharField(label='What is your board choice?', widget=forms.Select(choices=BOARD_CHOICES))
-    print(selected_board)
+    #print(selected_board)
 
 class ShapeForm(forms.Form):
     selected_shape = forms.CharField(widget=forms.RadioSelect(choices=SHAPE_CHOICES))
-    print(selected_shape)
+    x = forms.CharField(widget=forms.NumberInput(attrs={'placeholder': 'x coordinate'}), required=True)
+    y = forms.CharField(widget=forms.NumberInput(attrs={'placeholder': 'y coordinate'}), required=True)

@@ -12,13 +12,16 @@ from django.http import HttpResponse
 
 from .library import Board, BowlingBall, MarbleBall, TennisBall, BookBlock, DominoBlock, Segment, RotatingSegment
 
-
 import matplotlib.pyplot as plt
 import matplotlib.lines as mlines
 import matplotlib.patches as mpatches
 from matplotlib import animation
 from matplotlib.collections import PatchCollection
 
+from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
+from matplotlib.figure import Figure
+import numpy as np
+import io
 import json
 
 class RegisterView(View):
@@ -76,7 +79,10 @@ class HomeView(View):
 			print('Board selection failed')
 			return HttpResponse("class HomeView, post error: invalid board selection")
 
-def plotter(state):
+def plotter(state, board_id):
+	board_name = BoardModel.objects.get(bid=int(board_id))
+	board = Board.Board(name=board_name)
+	state = board.state()
 	frames = []
 	shapes = []
 	def init():
@@ -108,11 +114,19 @@ def plotter(state):
 	anim = animation.FuncAnimation(fig, animate, init_func=init,
 								   frames=len(frames), interval=20, blit=False)
 	#plt.show()
+	#return fig
+	canvas = FigureCanvas(fig)
+	buf = io.BytesIO()
+	plt.savefig(buf)
+	#plt.close(fig)
 
-def createShape(shapeID):
+	response = HttpResponse(buf.getvalue(), content_type='image/png')
+	return response
+
+def createShape(shapeID, x, y):
 	#shapeID- shape pairs are in forms.py
-	x = 200
-	y = 200 #gonna get these from forms as well
+	x = float(x)
+	y = float(y)
 	newShape = None
 	if shapeID == 1:
 		newShape = BowlingBall.BowlingBall(center=(x, y))
@@ -144,16 +158,18 @@ class BoardView(View):
 			return redirect('/login')
 
 		board_name = BoardModel.objects.get(bid=int(board_id))
-
-		return render(request, 'board.html', {'board_id': self.kwargs.get('board_id'), 'form': self.shape_form})
+		return render(request, 'board.html', {'board_id': self.kwargs.get('board_id'), 'username': request.user, 'form': self.shape_form, 'msg' : ''})
 
 	def post(self, request, board_id):
 		self.shape_form = forms.ShapeForm(data=request.POST)
 		if self.shape_form.is_valid():
 			selected_shape = self.shape_form.cleaned_data.get('selected_shape')
-			print("SELECTED SHAPE:::::::")
-			print(selected_shape)
-			newShape = createShape(shapeID=int(selected_shape))
+			x_coord = self.shape_form.cleaned_data['x']
+			y_coord = self.shape_form.cleaned_data['y']
+
+			#print(selected_shape)
+			newShape = createShape(shapeID=int(selected_shape), x = x_coord, y = y_coord)
+			content = 'New ' + str(newShape.getType()) + ' at coordinte (' + x_coord + ', ' +y_coord  + ') added successfully.'
 			board_name = BoardModel.objects.get(bid=int(board_id))
 			dir_path = os.path.dirname(os.path.realpath(__file__))
 			fname = os.path.join(dir_path, 'library/inputs', self.boardJSONs[board_id])
@@ -167,7 +183,7 @@ class BoardView(View):
 
 			board_name.bstate = json.dumps(self.board.save())
 			board_name.save()
-			return HttpResponse(selected_shape)
+			return render(request, 'board.html', {'board_id': self.kwargs.get('board_id'), 'form': self.shape_form, 'msg' : content})
 
 		else:
 			print('Shape selection failed')

@@ -26,4 +26,5 @@ urlpatterns = [
     path('home/', views.HomeView.as_view(), name='home'),
     path('logout/', views.LogoutView.as_view(), name='logout'),
     url(r'^board/(?P<board_id>\d+)$', views.BoardView.as_view(), name='board'),
+    url(r'^board/(?P<board_id>\d+)/game/', views.plotter, name='game'),
 ]
