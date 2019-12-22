@@ -48,11 +48,13 @@ class Board():
         self.space.step(self.step_size)
 
     def addShape(self, shape, offset=0):
+        allIDs = self.allShapes.keys()
+        allIDs = list(map(int, allIDs))
+        print(allIDs)
+        new_id = str(max(allIDs)+1)
         body = shape.getBody()
         self.space.add(shape)
         self.space.add(body)
-        new_id = self.id_counter
-        self.id_counter += 1
         self.allShapes[str(new_id)] = shape
 
     def addShapeWithID(self, shape, shape_id):
