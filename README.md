@@ -1,7 +1,9 @@
-# phase3-chain
+# ceng445-phase4
+
+A chain reaction simulator for CENG445 Software Development with Scripting Languages
 
 virtual environment stuff:  
-    ~/phase3-chain/
+    ~/ceng445-phase4/
 
         virtualenv -p python3.6 script_env //create  
         source script_env/bin/activate //activate  
@@ -12,7 +14,7 @@ django stuff:
         create(or update??) database: python manage.py migrate    
         create application: python manage.py startapp chain  
 
-    ~/phase3-chain/chain_reaction
+    ~/ceng445-phase4/chain_reaction
         pip install django
         pip install django-matplotlib
         pip install pymunk 
